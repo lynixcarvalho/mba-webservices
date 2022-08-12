@@ -1,0 +1,32 @@
+{% extends 'layout.html' %}
+
+{% block mainbar %}
+<div class="container-fluid p-2 bg-primary text-white text-center">
+    <h1>Cartões</h1>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Número Cartão</th>
+            <th>Titular</th>
+            <th>Limite</th>
+            <th>Data Vencimento</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for cartao in cartoes %}
+        <tr>
+            <td>{{ cartao.number }}</td>
+            <td><a href="/cliente_search/{{ cartao.client_id }}">{{ cartao.client_id }}</a></td>
+            <td>{{ cartao.limite }}</td>
+            <td>{{ cartao.vencimento }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

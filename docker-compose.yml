@@ -1,0 +1,48 @@
+version: '3'
+
+services:
+
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root_pwd
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./mongo_data:/data/db
+
+  cartao_api:
+    build: ./CartaoAPI
+    image: cartao_api
+    ports:
+      - "8001:8001"
+    depends_on:
+      - mongo
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    #command: uvicorn --workers 1 --threads 8 --bind :8000 wsgi:server s
+
+  cliente_api:
+      build: ClienteAPI
+      image: cliente_api
+      ports:
+        - "8000:8000"
+      depends_on:
+        - mongo
+      volumes:
+        - /etc/localtime:/etc/localtime:ro
+      command: uvicorn api:app --host 0.0.0.0 --port 8000 --reload
+
+  website:
+      build: ./Website
+      image: website
+      ports:
+        - "9000:9000"
+      depends_on:
+        - mongo
+      volumes:
+        - /etc/localtime:/etc/localtime:ro
+      command: python3 manage.py runserver 0.0.0.0:9000
