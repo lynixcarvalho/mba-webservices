@@ -10,5 +10,6 @@ urlpatterns = [
     # Post
     path('cartao_create/', views.cartao_create, name='cartao_create'),
     path('cartao_delete/', views.cartao_delete, name='cartao_delete'),
-    # path('cartao_update/', views.cartao_update, name='cartao_update'),
+    # Put / Patch
+    path('cartao_update/', views.cartao_update, name='cartao_update'),
 ]

@@ -20,7 +20,7 @@
         {% for cartao in cartoes %}
         <tr>
             <td>{{ cartao.id }}</td>
-            <td><a href="/cliente_search/{{ cartao.client_id }}">{{ cartao.cliente_id }}</a></td>
+            <td><a href="/cliente_search/{{ cartao.cliente_id }}">{{ cartao.cliente_id }}</a></td>
             <td>{{ cartao.limite }}</td>
         </tr>
         {% endfor %}

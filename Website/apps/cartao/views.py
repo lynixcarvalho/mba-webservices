@@ -127,3 +127,36 @@ def cartao_delete(request):
         form = SearchForm()
 
     return render(request, 'cartao_delete.html', {'form': form})
+
+
+def cartao_update(request):
+
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+
+        # create a form instance and populate it with data from the request:
+        form = UpdateForm(request.POST)
+
+        # check whether it's valid:
+        if form.is_valid():
+
+            number = form.cleaned_data['number']
+            limite = form.cleaned_data['limite']
+
+            cartao = {
+                "limite": limite
+            }
+
+            # pull data from third party rest api
+            response = requests.patch(f"{urlAPI}/cartao/{number}", json=cartao)
+
+            # convert reponse data into json
+            msg = response.json()
+
+            return render(request, "index.html", {'msg': msg['msg']})
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = UpdateForm()
+
+    return render(request, 'cartao_update.html', {'form': form})

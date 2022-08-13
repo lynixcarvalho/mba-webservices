@@ -143,10 +143,10 @@ def update_cliente_from_card(item_id, item: UpdateCardItem):
         if not cliente:
             return {'msg': 'Cliente não cadastrado na base'}
 
-        if cliente['card']:
+        if isinstance(cliente['card'], list):
             cliente['card'].append(item.card)
         else:
-            cliente['card'] = item.card
+            cliente['card'] = [item.card]
 
         collection.find_one_and_replace({'_id': item_id}, cliente)
 

@@ -85,24 +85,29 @@ def cartao_create_new(item: Item):
 
             # Checagem se o ID está em uso
             if not search:
-                gen_id = False
+                gen_card = False
 
         cliente = list(filter(lambda x: x, collection2.find({'_id': item['cliente_id']})))
 
-        cartao = {
-            "card": item['_id']
-        }
+        if cliente:
 
-        response = requests.patch(f"{urlAPI}/cliente_from_card/{cliente[0]['_id']}", json=cartao)
+            cartao = {
+                "card": item['_id']
+            }
 
-        if response.json()['msg'] == 'Cliente atualizado com sucesso.':
+            response = requests.patch(f"{urlAPI}/cliente_from_card/{cliente[0]['_id']}", json=cartao)
 
-            collection.insert_one(item)
+            if response.json()['msg'] == 'Cliente atualizado com sucesso.':
 
-            return {'msg': 'Cartao adicionado com sucesso!'}
+                collection.insert_one(item)
+
+                return {'msg': 'Cartao adicionado com sucesso!'}
+
+            else:
+                return response.json()
 
         else:
-            return response.json()
+            return {'msg': 'Cliente informado não cadastrado na base.'}
 
     except Exception as err:
         return {'msg': err}
@@ -125,22 +130,17 @@ def cartao_delete(item_id):
         return {'msg': err}
 
 
-# @app.put('/cartao/{id}')
-# def update_client(id, item: UpdateItem):
-#
-#     try:
-#
-#         card = collection.find_one({'_id': id})
-#
-#         if not card:
-#             return {'Error': 'Card does not exist'}
-#
-#         if item.card_limit is not None:
-#             card['card_limit'] = item.card_limit
-#             collection.find_one_and_replace({'_id': id}, card)
-#             return {'Msg': 'Card atualizado com sucesso.'}
-#         else:
-#             return {'Error': 'Operação de update exige os campos name e address'}
-#
-#     except Exception as err:
-#         return {'Error': err}
+@app.patch('/cartao/{item_id}')
+def update_cartao(item_id, item: UpdateItem):
+
+    try:
+
+        card = collection.find_one({"_id": item_id})
+
+        if not card:
+            return {"msg": "Cartão não cadastrado na base."}
+
+        collection.update_one({"_id": item_id}, {"$set": {"limite": item.limite}})
+
+    except Exception as err:
+        return {'Error': err}
