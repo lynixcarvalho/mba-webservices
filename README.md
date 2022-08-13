@@ -21,6 +21,9 @@ Esse repositório abriga o código de um sistema simples de cadastro e gerenciam
 - Git
 
 ### Passo a passo para a execução:
+
+#### Manual
+
 1. Clonar projeto do GitHub:
 ~~~bash
 $ git clone git@github.com:lynixcarvalho/mba-webservices.git
@@ -30,8 +33,21 @@ $ cd mba-webservices
 ~~~bash
 $ docker-compose up -d
 ~~~
-3. Para acessar a URL do front-end e interagir com a API acesse localhost:9000 no navegador.
-4. Para acessar a documentação da API acesse localhost:8000 no navegador.
+
+#### Linux / Mac
+- Usuários de Linux/Mac podem executar diretamente o script runserver.sh
+~~~bash
+$ sh runserver.sh
+~~~
+
+### Front-end
+ 
+- Para acessar a URL do front-end e interagir com a API acesse localhost:9000 no navegador.
+
+### Documentação da API
+
+- Documentação da API de clientes: localhost:9100 no navegador.
+- Documentação da API de cartões: localhost:9200 no navegador.
 
 
 ## 👨🏽‍💻👩🏽‍💻 Desenvolvedores 
