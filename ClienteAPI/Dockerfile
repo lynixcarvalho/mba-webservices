@@ -13,4 +13,4 @@ ADD . $CLIENTE_API
 # install dependencies
 RUN  python -m pip install --no-cache-dir -r ./requirements.txt
 
-CMD uvicorn api:app --host 0.0.0.0 --port 8000 --reload
+CMD uvicorn api:app --host 0.0.0.0 --port 9100 --reload

@@ -1,28 +1,19 @@
 import re
+import requests
 from typing import Optional
 from fastapi import FastAPI
-from models import Item, UpdateItem
-from uuid import uuid4
+from models import Item, UpdateItem, UpdateCardItem
 from random import randint
 from mongo_con import collection
 
 
 app = FastAPI()
+urlAPI = "http://cartao_api:9200"
 
-
-# def generate_id():
-#     return str(uuid4())
 
 def generate_id():
     s = ''
     for i in range(6):
-        s += str(randint(0, 9))
-    return s
-
-
-def generate_card():
-    s = '99'
-    for i in range(14):
         s += str(randint(0, 9))
     return s
 
@@ -78,8 +69,15 @@ def cliente_create(item: Item):
     # Se no cadastro do cliente o checkbox de gerar cartão estiver marcado (True), é gerado um número de cartão
     # e adicionado ao cadastro do cliente
     if item['gen_card']:
+        cliente = {
+            "cliente_id": item["_id"],
+            "limite": 1000
+        }
+
+        response = requests.post(f"{urlAPI}/cartao_from_cliente", json=cliente)
+        card = response.json()['card']
         item['card'] = []
-        item['card'].append(generate_card())
+        item['card'].append(card)
 
     try:
         search = list(filter(lambda x: x, collection.find(item, {'_id': 0})))
@@ -101,6 +99,11 @@ def cliente_delete(item_id):
 
         if not search:
             return {'msg': 'Cliente não cadastrado na base.'}
+
+        cartoes = search[0]['card']
+
+        for cartao in cartoes:
+            response = requests.delete(f"{urlAPI}/cartao/{cartao}")
 
         collection.delete_one(search[0])
         return {'msg': 'Cliente removido com sucesso.'}
@@ -125,7 +128,29 @@ def cliente_update(item_id, item: UpdateItem):
             collection.find_one_and_replace({'_id': item_id}, cliente)
             return {'msg': 'Cliente atualizado com sucesso.'}
         else:
-            return {'msg': 'Atualização de cliente exige o preenchimento dos campos name e address'}
+            return {'msg': 'Atualização de cliente exige o preenchimento dos campos nome e endereco'}
+
+    except Exception as err:
+        return {'msg': err}
+
+
+@app.patch('/cliente_from_card/{item_id}')
+def update_cliente_from_card(item_id, item: UpdateCardItem):
+
+    try:
+        cliente = collection.find_one({'_id': item_id})
+
+        if not cliente:
+            return {'msg': 'Cliente não cadastrado na base'}
+
+        if cliente['card']:
+            cliente['card'].append(item.card)
+        else:
+            cliente['card'] = item.card
+
+        collection.find_one_and_replace({'_id': item_id}, cliente)
+
+        return {'msg': 'Cliente atualizado com sucesso.'}
 
     except Exception as err:
         return {'msg': err}

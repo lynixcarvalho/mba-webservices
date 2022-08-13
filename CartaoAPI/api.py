@@ -9,6 +9,7 @@ import requests
 # import datetime
 
 app = FastAPI()
+urlAPI = "http://cliente_api:9100"
 # data = datetime.datetime.now() + datetime.timedelta(days=3*365)
 
 
@@ -43,8 +44,33 @@ def cartao_search_id(item_id):
     return cartao
 
 
+@app.post('/cartao_from_cliente')
+def cartao_create_from_cliente(item: Item):
+
+    item = item.dict()
+    gen_card = True
+
+    try:
+        while gen_card is True:
+            # Chamada a função generate_id()
+            item['_id'] = generate_card()
+            # Consulta a base para checar se o ID já está em uso.
+            search = list(filter(lambda x: x, collection.find({'_id': item['_id']})))
+
+            # Checagem se o ID está em uso
+            if not search:
+                gen_card = False
+
+        collection.insert_one(item)
+
+        return {'msg': 'Cartão adicionado com sucesso!', 'card': item['_id']}
+
+    except Exception as err:
+        return {'msg': err}
+
+
 @app.post('/cartao')
-def cartao_create(item: Item):
+def cartao_create_new(item: Item):
 
     item = item.dict()
     # item['vencimento'] = data.strftime("%Y-%m-%d")
@@ -64,21 +90,16 @@ def cartao_create(item: Item):
         cliente = list(filter(lambda x: x, collection2.find({'_id': item['cliente_id']})))
 
         cartao = {
-            "card": [
-                item['_id']
-            ]
+            "card": item['_id']
         }
 
-        response = requests.patch(f"http://localhost:8000/cliente/{cliente[0]['_id']}", json=cartao)
+        response = requests.patch(f"{urlAPI}/cliente_from_card/{cliente[0]['_id']}", json=cartao)
 
         if response.json()['msg'] == 'Cliente atualizado com sucesso.':
 
-            # del item['client_id']
-            # item['client'] = client
-
             collection.insert_one(item)
 
-            return {'msg': 'Card adicionado com sucesso!'}
+            return {'msg': 'Cartao adicionado com sucesso!'}
 
         else:
             return response.json()
