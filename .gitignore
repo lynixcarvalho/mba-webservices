@@ -1,0 +1,12 @@
+# Virtual Environment
+venv/
+
+# IDEs
+.idea/
+.vscode/
+
+# DB Files
+mongo_data/
+
+# Others
+.DS_Store
