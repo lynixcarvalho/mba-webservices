@@ -142,5 +142,7 @@ def update_cartao(item_id, item: UpdateItem):
 
         collection.update_one({"_id": item_id}, {"$set": {"limite": item.limite}})
 
+        return {"msg": "Limite do cartão alterado com sucesso."}
+
     except Exception as err:
-        return {'Error': err}
+        return {'msg': err}
