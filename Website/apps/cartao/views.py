@@ -2,7 +2,8 @@ from django.shortcuts import render
 import requests
 
 from .forms import SearchForm, RegisterForm, UpdateForm
-urlAPI = "http://cartao_api:8001"
+
+urlAPI = "http://cartao_api:9200"
 
 
 # Create your views here.
@@ -58,6 +59,7 @@ def cartao_search(request):
 def cartao_search_number(request, number):
 
     response = requests.get(f"{urlAPI}/cartao/{number}")
+
     cartoes = list(response.json())
 
     for cartao in cartoes:

@@ -18,23 +18,23 @@ services:
     build: ./CartaoAPI
     image: cartao_api
     ports:
-      - "8001:8001"
+      - "9200:9200"
     depends_on:
       - mongo
     volumes:
       - /etc/localtime:/etc/localtime:ro
-    #command: uvicorn --workers 1 --threads 8 --bind :8000 wsgi:server s
+    command: uvicorn api:app --host 0.0.0.0 --port 9200 --reload
 
   cliente_api:
       build: ClienteAPI
       image: cliente_api
       ports:
-        - "8000:8000"
+        - "9100:9100"
       depends_on:
         - mongo
       volumes:
         - /etc/localtime:/etc/localtime:ro
-      command: uvicorn api:app --host 0.0.0.0 --port 8000 --reload
+      command: uvicorn api:app --host 0.0.0.0 --port 9100 --reload
 
   website:
       build: ./Website

@@ -13,4 +13,7 @@ class Item(BaseModel):
 class UpdateItem(BaseModel):
     name: Optional[str] = None
     address: Optional[str] = None
-    card: Optional[list] = []
+
+
+class UpdateCardItem(BaseModel):
+    card: str
