@@ -3,14 +3,14 @@ import requests
 
 from .forms import IdForm, SearchForm, RegisterForm, UpdateForm
 
-urlAPI = 'http://cliente_api:9100'
+urlAPI = 'http://cliente_api:9100/clientes'
 
 
 # Create your views here.
-def cliente_lista(request):
+def lista(request):
 
     # pull data from third party rest api
-    response = requests.get(f"{urlAPI}/cliente")
+    response = requests.get(f"{urlAPI}")
 
     # convert reponse data into json
     clientes = response.json()
@@ -18,10 +18,10 @@ def cliente_lista(request):
     for cliente in clientes:
         cliente['id'] = cliente.pop('_id')
 
-    return render(request, "cliente_lista.html", {'clientes': clientes})
+    return render(request, "clientes/lista.html", {'clientes': clientes})
 
 
-def cliente_search(request):
+def search(request):
 
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -37,49 +37,49 @@ def cliente_search(request):
             if form.cleaned_data['id']:
                 cliente_consulta = form.cleaned_data['id']
                 # pull data from third party rest api
-                response = requests.get(f"{urlAPI}/cliente/{cliente_consulta}")
+                response = requests.get(f"{urlAPI}/{cliente_consulta}")
                 # convert reponse data into json
                 clientes = list(response.json())
 
                 for cliente in clientes:
                     cliente['id'] = cliente.pop('_id')
 
-                return render(request, "cliente_single.html", {'clientes': clientes})
+                return render(request, "clientes/search_one.html", {'clientes': clientes})
 
             elif form.cleaned_data['name']:
                 cliente_consulta = form.cleaned_data['name']
                 # pull data from third party rest api
-                response = requests.get(f"{urlAPI}/cliente?name={cliente_consulta}")
+                response = requests.get(f"{urlAPI}?name={cliente_consulta}")
                 # convert reponse data into json
                 clientes = list(response.json())
 
                 for cliente in clientes:
                     cliente['id'] = cliente.pop('_id')
 
-                return render(request, "cliente_single.html", {'clientes': clientes})
+                return render(request, "clientes/search_one.html", {'clientes': clientes})
 
             else:
-                return render(request, 'cliente_search.html', {'form': form})
+                return render(request, 'clientes/search.html', {'form': form, 'resource': 'clientes'})
 
     # if a GET (or any other method) we'll create a blank form
     else:
         form = SearchForm
 
-    return render(request, 'cliente_search.html', {'form': form})
+    return render(request, 'clientes/search.html', {'form': form, 'resource': 'clientes'})
 
 
-def cliente_search_id(request, cliente_id):
+def search_id(request, cliente_id):
 
-    response = requests.get(f"{urlAPI}/cliente/{cliente_id}")
+    response = requests.get(f"{urlAPI}/{cliente_id}")
     clientes = list(response.json())
 
     for cliente in clientes:
         cliente['id'] = cliente.pop('_id')
 
-    return render(request, "cliente_single.html", {'clientes': clientes})
+    return render(request, "clientes/search_one.html", {'clientes': clientes})
 
 
-def cliente_create(request):
+def create(request):
 
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -100,7 +100,7 @@ def cliente_create(request):
             }
 
             # pull data from third party rest api
-            response = requests.post(f"{urlAPI}/cliente", json=cliente)
+            response = requests.post(f"{urlAPI}", json=cliente)
 
             # convert response data into json
             msg = response.json()
@@ -111,10 +111,10 @@ def cliente_create(request):
     else:
         form = RegisterForm()
 
-    return render(request, 'cliente_create.html', {'form': form})
+    return render(request, 'clientes/create.html', {'form': form})
 
 
-def cliente_delete(request):
+def delete(request):
 
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -128,7 +128,7 @@ def cliente_delete(request):
             cliente_id = form.cleaned_data['id']
 
             # pull data from third party rest api
-            response = requests.delete(f"{urlAPI}/cliente/{cliente_id}")
+            response = requests.delete(f"{urlAPI}/{cliente_id}")
 
             # convert reponse data into json
             msg = response.json()
@@ -139,10 +139,10 @@ def cliente_delete(request):
     else:
         form = IdForm()
 
-    return render(request, 'cliente_delete.html', {'form': form})
+    return render(request, 'clientes/delete.html', {'form': form, 'resource': 'clientes'})
 
 
-def cliente_update(request):
+def update(request):
 
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -162,7 +162,7 @@ def cliente_update(request):
             }
 
             # pull data from third party rest api
-            response = requests.put(f"{urlAPI}/cliente/{cliente_id}", json=cliente)
+            response = requests.put(f"{urlAPI}/{cliente_id}", json=cliente)
 
             # convert reponse data into json
             msg = response.json()
@@ -173,4 +173,4 @@ def cliente_update(request):
     else:
         form = UpdateForm()
 
-    return render(request, 'cliente_update.html', {'form': form})
+    return render(request, 'clientes/update.html', {'form': form, 'resource': 'clientes'})

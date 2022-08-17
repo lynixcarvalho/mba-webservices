@@ -3,25 +3,25 @@ import requests
 
 from .forms import SearchForm, RegisterForm, UpdateForm
 
-urlAPI = "http://cartao_api:9200"
+urlAPI = "http://cartao_api:9200/cartoes"
 
 
 # Create your views here.
-def cartao_lista(request):
+def lista(request):
 
     # pull data from third party rest api
-    response = requests.get(f"{urlAPI}/cartao")
+    response = requests.get(f"{urlAPI}")
 
     # convert reponse data into json
-    cartao = response.json()
+    cartoes = response.json()
 
-    for card in cartao:
-        card['id'] = card.pop('_id')
+    for cartao in cartoes:
+        cartao['id'] = cartao.pop('_id')
 
-    return render(request, "cartao_lista.html", {'cartao': cartao})
+    return render(request, "cartoes/lista.html", {'cartoes': cartoes})
 
 
-def cartao_search(request):
+def search(request):
 
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -32,43 +32,47 @@ def cartao_search(request):
         # check whether it's valid:
         if form.is_valid():
 
-            response = None
-
             if form.cleaned_data['number']:
-                cartao_consulta = form.cleaned_data['number']
-                # pull data from third party rest api
-                response = requests.get(f"{urlAPI}/cartao/{cartao_consulta}")
-                # convert reponse data into json
+                number = form.cleaned_data['number']
+
+                response = requests.get(f"{urlAPI}/{number}")
+
+                if response.json() == {'msg': 'Cartão não cadastrado na base.'}:
+                    return render(request, "index.html", response.json())
+
                 cartoes = list(response.json())
 
                 for cartao in cartoes:
                     cartao['id'] = cartao.pop('_id')
 
-                return render(request, "cartao_single.html", {'cartoes': cartoes})
+                return render(request, "cartoes/search_one.html", {'cartoes': cartoes})
 
             else:
-                return render(request, 'cartao_search.html', {'form': form})
+                return render(request, 'cartoes/search.html', {'form': form})
 
     # if a GET (or any other method) we'll create a blank form
     else:
         form = SearchForm
 
-    return render(request, 'cartao_search.html', {'form': form})
+    return render(request, 'cartoes/search.html', {'form': form})
 
 
-def cartao_search_number(request, number):
+def search_number(request, number):
 
-    response = requests.get(f"{urlAPI}/cartao/{number}")
+    response = requests.get(f"{urlAPI}/{number}")
+
+    if response.json() == {'msg': 'Cartão não cadastrado na base.'}:
+        return render(request, "index.html", response.json())
 
     cartoes = list(response.json())
 
     for cartao in cartoes:
         cartao['id'] = cartao.pop('_id')
 
-    return render(request, "cartao_single.html", {'cartoes': cartoes})
+    return render(request, "cartoes/search_one.html", {'cartoes': cartoes})
 
 
-def cartao_create(request):
+def create(request):
 
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -87,7 +91,7 @@ def cartao_create(request):
             }
 
             # pull data from third party rest api
-            response = requests.post(f"{urlAPI}/cartao", json=cartao)
+            response = requests.post(f"{urlAPI}", json=cartao)
 
             # convert response data into json
             msg = response.json()
@@ -98,10 +102,10 @@ def cartao_create(request):
     else:
         form = RegisterForm()
 
-    return render(request, 'cartao_create.html', {'form': form})
+    return render(request, 'cartoes/create.html', {'form': form, 'resource': 'cartoes'})
 
 
-def cartao_delete(request):
+def delete(request):
 
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -115,7 +119,7 @@ def cartao_delete(request):
             number = form.cleaned_data['number']
 
             # pull data from third party rest api
-            response = requests.delete(f"{urlAPI}/cartao/{number}")
+            response = requests.delete(f"{urlAPI}/{number}")
 
             # convert reponse data into json
             msg = response.json()
@@ -126,10 +130,10 @@ def cartao_delete(request):
     else:
         form = SearchForm()
 
-    return render(request, 'cartao_delete.html', {'form': form})
+    return render(request, 'cartoes/delete.html', {'form': form, 'resource': 'cartoes'})
 
 
-def cartao_update(request):
+def update(request):
 
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -148,7 +152,7 @@ def cartao_update(request):
             }
 
             # pull data from third party rest api
-            response = requests.patch(f"{urlAPI}/cartao/{number}", json=cartao)
+            response = requests.patch(f"{urlAPI}/{number}", json=cartao)
 
             # convert reponse data into json
             msg = response.json()
@@ -159,4 +163,4 @@ def cartao_update(request):
     else:
         form = UpdateForm()
 
-    return render(request, 'cartao_update.html', {'form': form})
+    return render(request, 'cartoes/update.html', {'form': form, 'resource': 'cartoes'})

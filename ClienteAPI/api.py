@@ -18,7 +18,7 @@ def generate_id():
     return s
 
 
-@app.get('/cliente')
+@app.get('/clientes')
 def cliente_search(
         name: Optional[str] = None,
         address: Optional[str] = None):
@@ -36,7 +36,7 @@ def cliente_search(
         return {'msg': err}
 
 
-@app.get('/cliente/{item_id}')
+@app.get('/clientes/{item_id}')
 def cliente_search_id(item_id):
 
     cliente = list(filter(lambda x: x["_id"] == item_id, collection.find({})))
@@ -47,7 +47,7 @@ def cliente_search_id(item_id):
     return cliente
 
 
-@app.post('/cliente')
+@app.post('/clientes')
 def cliente_create(item: Item):
 
     item = item.dict()
@@ -70,8 +70,7 @@ def cliente_create(item: Item):
     # e adicionado ao cadastro do cliente
     if item['gen_card']:
         cliente = {
-            "cliente_id": item["_id"],
-            "limite": 1000
+            "cliente_id": item["_id"]
         }
 
         response = requests.post(f"{urlAPI}/cartao_from_cliente", json=cliente)
@@ -90,7 +89,7 @@ def cliente_create(item: Item):
         return {'msg': err}
 
 
-@app.delete('/cliente/{item_id}')
+@app.delete('/clientes/{item_id}')
 def cliente_delete(item_id):
 
     try:
@@ -103,7 +102,7 @@ def cliente_delete(item_id):
         cartoes = search[0]['card']
 
         for cartao in cartoes:
-            response = requests.delete(f"{urlAPI}/cartao/{cartao}")
+            response = requests.delete(f"{urlAPI}/cartoes/{cartao}")
 
         collection.delete_one(search[0])
         return {'msg': 'Cliente removido com sucesso.'}
@@ -112,7 +111,7 @@ def cliente_delete(item_id):
         return {'msg': err}
 
 
-@app.put('/cliente/{item_id}')
+@app.put('/clientes/{item_id}')
 def cliente_update(item_id, item: UpdateItem):
 
     try:

@@ -24,7 +24,7 @@
             <td>{{ cliente.name }}</td>
             <td>{{ cliente.address }}</td>
             {% for card in cliente.card %}
-                <td><a href="/cartao_search/{{ card }}">{{ card }}</a></td>
+                <td><a href="/cartoes/search/{{ card }}">{{ card }}</a></td>
             {% endfor %}
         </tr>
         {% endfor %}

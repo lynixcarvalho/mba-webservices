@@ -1,26 +1,37 @@
-import re
-from typing import Optional
 from fastapi import FastAPI
 from models import Item, UpdateItem
-from uuid import uuid4
 from random import randint
 from mongo_con import collection, collection2
 import requests
-# import datetime
+import datetime
 
 app = FastAPI()
 urlAPI = "http://cliente_api:9100"
-# data = datetime.datetime.now() + datetime.timedelta(days=3*365)
 
 
 def generate_card():
-    s = '99'
+    card_number = '99'
+    cvv = ''
+
     for i in range(14):
-        s += str(randint(0, 9))
-    return s
+        card_number += str(randint(0, 9))
+
+    for i in range(3):
+        cvv += str(randint(0, 9))
+
+    data_vcto = datetime.datetime.now() + datetime.timedelta(days=3*365)
+
+    card = {
+        "number": card_number,
+        "cvv": cvv,
+        "limite": 1000,
+        "data_vcto": data_vcto.isoformat()[0:10]
+    }
+
+    return card
 
 
-@app.get('/cartao')
+@app.get('/cartoes')
 def cartao_search():
 
     try:
@@ -30,16 +41,16 @@ def cartao_search():
         return cartao
 
     except Exception as err:
-        return {'Msg': err}
+        return {'msg': err}
 
 
-@app.get('/cartao/{item_id}')
+@app.get('/cartoes/{item_id}')
 def cartao_search_id(item_id):
 
     cartao = list(filter(lambda x: x["_id"] == item_id, collection.find({})))
 
     if not cartao:
-        return {'Error': 'Cartão não cadastrado na base.'}
+        return {'msg': 'Cartão não cadastrado na base.'}
 
     return cartao
 
@@ -52,8 +63,10 @@ def cartao_create_from_cliente(item: Item):
 
     try:
         while gen_card is True:
-            # Chamada a função generate_id()
-            item['_id'] = generate_card()
+            # Chamada a função generate_card()
+            item = generate_card()
+            item['_id'] = item.pop('number')
+
             # Consulta a base para checar se o ID já está em uso.
             search = list(filter(lambda x: x, collection.find({'_id': item['_id']})))
 
@@ -69,17 +82,18 @@ def cartao_create_from_cliente(item: Item):
         return {'msg': err}
 
 
-@app.post('/cartao')
+@app.post('/cartoes')
 def cartao_create_new(item: Item):
 
     item = item.dict()
-    # item['vencimento'] = data.strftime("%Y-%m-%d")
     gen_card = True
 
     try:
         while gen_card is True:
-            # Chamada a função generate_id()
-            item['_id'] = generate_card()
+            # Chamada a função generate_card()
+            item = generate_card()
+            item['_id'] = item.pop('number')
+
             # Consulta a base para checar se o ID já está em uso.
             search = list(filter(lambda x: x, collection.find({'_id': item['_id']})))
 
@@ -113,7 +127,7 @@ def cartao_create_new(item: Item):
         return {'msg': err}
 
 
-@app.delete('/cartao/{item_id}')
+@app.delete('/cartoes/{item_id}')
 def cartao_delete(item_id):
 
     try:
@@ -123,6 +137,17 @@ def cartao_delete(item_id):
         if not cartao:
             return {'msg': 'Cartão não cadastrado na base.'}
 
+        cliente_id = cartao[0]['cliente_id']
+        print(cliente_id)
+        cliente = list(filter(lambda x: x, collection2.find({'_id': cliente_id})))
+        print(cliente)
+        cartoes = cliente[0]['card']
+        print(cartoes)
+        # cartoes.pop(item_id)
+        cartoes.pop(cartoes.index(item_id))
+
+        collection2.find_one_and_replace({'_id': cliente_id}, cliente[0])
+
         collection.delete_one(cartao[0])
         return {'msg': 'Cartão removido com sucesso.'}
 
@@ -130,7 +155,7 @@ def cartao_delete(item_id):
         return {'msg': err}
 
 
-@app.patch('/cartao/{item_id}')
+@app.patch('/cartoes/{item_id}')
 def update_cartao(item_id, item: UpdateItem):
 
     try:

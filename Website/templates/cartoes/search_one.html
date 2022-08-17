@@ -14,14 +14,18 @@
             <th>Número Cartão</th>
             <th>Titular</th>
             <th>Limite</th>
+            <th>CVV</th>
+            <th>Data de Vencimento</th>
         </tr>
         </thead>
         <tbody>
-        {% for card in cartao %}
+        {% for cartao in cartoes %}
         <tr>
-            <td><a href="/cartao_search/{{ card.id }}">{{ card.id }}</a></td>
-            <td>{{ card.cliente_id }}</td>
-            <td>{{ card.limite }}</td>
+            <td>{{ cartao.id }}</td>
+            <td><a href="/clientes/search/{{ cartao.cliente_id }}">{{ cartao.cliente_id }}</a></td>
+            <td>{{ cartao.limite }}</td>
+            <td>{{ cartao.cvv }}</td>
+            <td>{{ cartao.data_vcto }}</td>
         </tr>
         {% endfor %}
         </tbody>

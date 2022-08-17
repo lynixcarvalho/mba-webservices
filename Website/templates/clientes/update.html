@@ -2,12 +2,12 @@
 
 {% block mainbar %}
 <div class="container-fluid p-2 bg-primary text-white text-center">
-    <h1>Create cartão</h1>
+    <h1>Atualiza cliente</h1>
 </div>
 {% endblock %}
 
 {% block content %}
-<form action="/cartao_create/" method="post">
+<form action="/clientes/update" method="post">
     {% csrf_token %}
     {{ form }}
     <input type="submit" value="Submit">

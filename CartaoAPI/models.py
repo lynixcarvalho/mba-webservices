@@ -1,10 +1,10 @@
-from typing import Optional
+from typing import Union
 from pydantic import BaseModel
 
 
 class Item(BaseModel):
     cliente_id: str
-    limite: float
+    card: dict[str, Union[str, int]] = None
 
 
 class UpdateItem(BaseModel):

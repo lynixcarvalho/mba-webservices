@@ -2,7 +2,7 @@
 
 {% block mainbar %}
 <div class="container-fluid p-2 bg-primary text-white text-center">
-    <h1>Cartões</h1>
+    <h1>Clientes</h1>
 </div>
 {% endblock %}
 
@@ -11,17 +11,17 @@
     <table class="table">
         <thead>
         <tr>
-            <th>Número Cartão</th>
-            <th>Titular</th>
-            <th>Limite</th>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Endereço</th>
         </tr>
         </thead>
         <tbody>
-        {% for cartao in cartoes %}
+        {% for cliente in clientes %}
         <tr>
-            <td>{{ cartao.id }}</td>
-            <td><a href="/cliente_search/{{ cartao.cliente_id }}">{{ cartao.cliente_id }}</a></td>
-            <td>{{ cartao.limite }}</td>
+            <td><a href="/clientes/search/{{ cliente.id }}">{{ cliente.id }}</a></td>
+            <td>{{ cliente.name }}</td>
+            <td>{{ cliente.address }}</td>
         </tr>
         {% endfor %}
         </tbody>
